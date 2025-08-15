@@ -3,337 +3,800 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trắc nghiệm Khoa học Vật liệu</title>
-    <!-- Thư viện Tailwind CSS để tạo giao diện đẹp và responsive -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Trò Chơi Ba Định Luật Newton</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cabin:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6; /* Nền xám nhạt */
+        :root {
+            --bg-color: #F9F6F3;
+            --accent-color: #F5C9B0;
+            --correct-color: #A6B28B;
+            --primary-color: #1C352D;
+            --border-radius: 1rem;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
+
+        body {
+            font-family: 'Cabin', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--primary-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 1rem;
+            box-sizing: border-box;
+            text-align: center;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .game-container {
+            background-color: #fff;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 2rem;
+            max-width: 600px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            box-sizing: border-box;
+        }
+
+        h1, h2 {
+            margin: 0;
+            font-weight: 700;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--accent-color);
+            border-radius: 0.5rem;
+            font-family: 'Cabin', sans-serif;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-family: 'Cabin', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+            transition: background-color 0.3s, transform 0.1s;
+            box-shadow: var(--shadow);
+        }
+
+        button:hover {
+            background-color: var(--correct-color);
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Start Screen */
+        .start-screen {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        /* Game Screen */
+        .game-screen {
+            display: none;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .question-box {
+            background-color: #f5f5f5;
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: left;
+        }
+        
+        .question-text {
+            font-size: 1.2rem;
+            line-height: 1.5;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .option-button {
+            width: 100%;
+            background-color: #f5f5f5;
+            color: var(--primary-color);
+            text-align: left;
+            padding: 1rem;
+            box-shadow: var(--shadow);
+            transition: background-color 0.3s, color 0.3s, transform 0.1s;
+        }
+
+        .option-button:hover:not(.selected) {
+            background-color: #e0e0e0;
+        }
+
+        .option-button.selected {
+            background-color: var(--accent-color);
+            color: #fff;
+        }
+
+        .option-button.correct {
+            background-color: var(--correct-color);
+            color: #fff;
+        }
+        
+        .option-button.wrong {
+            background-color: #e74c3c;
+            color: #fff;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .action-buttons button {
+            flex-grow: 1;
+        }
+
+        /* Fill-in-the-blank */
+        .fill-in-blank-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            text-align: left;
+        }
+
+        .fill-in-blank-container input {
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        /* Matching */
+        .matching-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+        }
+
+        .matching-item {
+            background-color: #f5f5f5;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+            box-shadow: var(--shadow);
+            user-select: none;
+        }
+
+        .matching-item.selected {
+            background-color: var(--accent-color);
+            color: #fff;
+            transform: scale(1.05);
+        }
+
+        .matching-item.matched {
+            background-color: var(--correct-color);
+            color: #fff;
+            cursor: default;
+        }
+
+        .explanation {
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-top: 1rem;
+            display: none;
+        }
+        
+        .explanation.show {
+            display: block;
+        }
+        
+        /* Result Screen */
+        .result-screen {
+            display: none;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .result-screen-capture {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            padding: 2rem;
+            background-color: var(--bg-color);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 1rem;
+        }
+        
+        .result-screen-capture h2 {
+            color: var(--correct-color);
+        }
+        
+        .score-display {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .message {
+            font-size: 1.2rem;
+        }
+
+        .icon-container {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto;
+            border-radius: 50%;
+            background-color: var(--accent-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .icon-container svg {
+            width: 60px;
+            height: 60px;
+            fill: var(--primary-color);
+        }
+        
+        #result-canvas {
+            display: none;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .correct-answer-animation {
+            animation: pulse 0.5s ease-in-out;
+        }
+
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen">
+<body>
 
-
-    <div id="app" class="bg-white p-8 md:p-12 rounded-2xl shadow-xl w-full max-w-lg mx-4 text-center">
-
-
-        <!-- Màn hình bắt đầu -->
-        <div id="start-screen" class="">
-            <h1 class="text-3xl font-bold mb-4 text-gray-800">Trắc nghiệm Khoa học Vật liệu</h1>
-            <p class="text-gray-600 mb-8">Hãy cùng ôn tập kiến thức từ tài liệu của bạn!</p>
-            <button id="start-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transition duration-300 transform hover:scale-105 focus:outline-none">
-                Bắt đầu
-            </button>
-        </div>
-
-
-        <!-- Container chính của bài trắc nghiệm -->
-        <div id="quiz-container" class="hidden">
-            <h2 id="question-text" class="text-xl md:text-2xl font-semibold mb-6 text-gray-800">Câu hỏi</h2>
-           
-            <div id="options-container" class="space-y-4">
-                <!-- Các nút tùy chọn sẽ được thêm vào đây bằng JavaScript -->
-            </div>
-
-
-            <!-- Vùng phản hồi kết quả -->
-            <div id="feedback-container" class="mt-6 h-6">
-                <!-- Thông báo đúng/sai sẽ hiển thị ở đây -->
-            </div>
-
-
-            <!-- Nút điều hướng -->
-            <div class="mt-8">
-                <button id="next-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transition duration-300 transform hover:scale-105 focus:outline-none hidden">
-                    Câu tiếp theo
-                </button>
-            </div>
-        </div>
-
-
-        <!-- Màn hình kết quả -->
-        <div id="result-screen" class="hidden">
-            <h2 class="text-3xl font-bold mb-4 text-gray-800">Kết quả của bạn</h2>
-            <p class="text-5xl font-extrabold text-blue-600 mb-4">
-                <span id="score-display">0</span>/<span id="total-questions">0</span>
-            </p>
-            <p id="result-message" class="text-gray-600 mb-8"></p>
-            <button id="restart-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transition duration-300 transform hover:scale-105 focus:outline-none">
-                Làm lại
-            </button>
-        </div>
-
-
+<div class="game-container">
+    <!-- Start Screen -->
+    <div id="start-screen" class="start-screen">
+        <h2>Trò Chơi Ba Định Luật Newton</h2>
+        <p>Hành trình khám phá thế giới vật lý bắt đầu!</p>
+        <input type="text" id="user-name" placeholder="Nhập tên của bạn" required>
+        <input type="text" id="user-stt" placeholder="Nhập số thứ tự" required>
+        <button id="start-button">Bắt đầu</button>
     </div>
 
+    <!-- Game Screen -->
+    <div id="game-screen" class="game-screen">
+        <div class="header">
+            <span id="timer">⏰ 60s</span>
+            <span id="score">⭐ Điểm: 0</span>
+        </div>
+        <div class="question-box">
+            <p id="question-text" class="question-text"></p>
+            <div id="options-container" class="options-container"></div>
+        </div>
+        <div id="explanation-box" class="explanation"></div>
+        <div class="action-buttons">
+            <button id="hint-button">Gợi ý</button>
+            <button id="skip-button">Bỏ qua câu hỏi</button>
+        </div>
+    </div>
 
-    <script>
-        // Mảng chứa các câu hỏi trắc nghiệm
-        const quizQuestions = [
-            {
-                question: "Công thức nào sau đây biểu diễn định luật Bragg?",
-                options: ["$n\\lambda = d\\sin\\theta$", "$n\\lambda = 2d\\sin\\theta$", "$n\\lambda = 2d\\cos\\theta$", "$2n\\lambda = d\\sin\\theta$"],
-                correctAnswer: "$n\\lambda = 2d\\sin\\theta$"
-            },
-            {
-                question: "Theo tài liệu, cơ chế chính của hiện tượng nhiễu xạ tia X trong tinh thể là gì?",
-                options: [
-                    "Sự sắp xếp ngẫu nhiên của các nguyên tử làm tăng cường chùm tán xạ.",
-                    "Các nguyên tử sắp xếp có trật tự, tuần hoàn trong không gian làm các chùm tán xạ tăng cường nhau.",
-                    "Sự dao động nhiệt của nguyên tử quanh vị trí cân bằng.",
-                    "Hiện tượng quang điện."
-                ],
-                correctAnswer: "Các nguyên tử sắp xếp có trật tự, tuần hoàn trong không gian làm các chùm tán xạ tăng cường nhau."
-            },
-            {
-                question: "Kỹ thuật phân tích nào sau đây dựa trên lý thuyết về hiệu ứng quang điện để xác định thành phần và trạng thái hóa học trên bề mặt vật liệu?",
-                options: ["Nhiễu xạ kế tia X (XRD)", "Kính hiển vi lực nguyên tử (AFM)", "Phổ kế quang điện tử tia X (XPS)", "Kính hiển vi điện tử quét (SEM)"],
-                correctAnswer: "Phổ kế quang điện tử tia X (XPS)"
-            },
-            {
-                question: "Kỹ thuật nào sau đây cho phép quan sát hình thái học bề mặt của vật rắn ở cấp độ nguyên tử, nhưng yêu cầu mẫu phải là vật liệu dẫn điện?",
-                options: ["Kính hiển vi lực nguyên tử (AFM)", "Kính hiển vi điện tử quét (SEM)", "Kính hiển vi quét chui ngầm (STM)", "Nhiễu xạ kế tia X (XRD)"],
-                correctAnswer: "Kính hiển vi quét chui ngầm (STM)"
-            },
-            {
-                question: "Đâu là một ưu điểm nổi bật của Kính hiển vi lực nguyên tử (AFM) so với Kính hiển vi quét chui ngầm (STM)?",
-                options: [
-                    "Tốc độ ghi ảnh nhanh hơn.",
-                    "Có thể quan sát cấu trúc nguyên tử riêng lẻ.",
-                    "Không yêu cầu mẫu dẫn điện.",
-                    "Phải thực hiện trong môi trường chân không cao."
-                ],
-                correctAnswer: "Không yêu cầu mẫu dẫn điện."
-            },
-            {
-                question: "Theo tài liệu, cơ chế hoạt động của Kính hiển vi lực nguyên tử (AFM) dựa trên nguyên lý nào?",
-                options: [
-                    "Dòng chui hầm lượng tử.",
-                    "Sự tương tác Van der Waals giữa đầu mũi dò và bề mặt mẫu.",
-                    "Sự phản xạ của chùm điện tử.",
-                    "Hiện tượng quang điện."
-                ],
-                correctAnswer: "Sự tương tác Van der Waals giữa đầu mũi dò và bề mặt mẫu."
-            },
-            {
-                question: "Trong Kính hiển vi điện tử quét (SEM), hệ thấu kính từ có vai trò chính là gì?",
-                options: [
-                    "Phát ra chùm điện tử.",
-                    "Thu nhận ảnh từ các điện tử thứ cấp.",
-                    "Tập trung và điều khiển chùm điện tử.",
-                    "Giữ mẫu vật."
-                ],
-                correctAnswer: "Tập trung và điều khiển chùm điện tử."
-            },
-            {
-                question: "Kỹ thuật chế tạo màng mỏng nào dựa trên nguyên lý truyền động năng bằng cách dùng các ion khí hiếm bắn phá bề mặt bia vật liệu?",
-                options: ["Bốc bay nhiệt (Thermal evaporation)", "Quang khắc (Photolithography)", "Phún xạ (Sputtering)", "Khắc chùm tia điện tử (EBL)"],
-                correctAnswer: "Phún xạ (Sputtering)"
-            },
-            {
-                question: "Sự khác biệt chính giữa phún xạ DC và phún xạ RF là gì?",
-                options: [
-                    "Phún xạ DC dùng bia không dẫn điện, phún xạ RF dùng bia dẫn điện.",
-                    "Phún xạ DC dùng hiệu điện thế một chiều, phún xạ RF dùng hiệu điện thế xoay chiều.",
-                    "Phún xạ DC có tốc độ cao hơn.",
-                    "Phún xạ RF không yêu cầu chân không."
-                ],
-                correctAnswer: "Phún xạ DC dùng hiệu điện thế một chiều, phún xạ RF dùng hiệu điện thế xoay chiều."
-            },
-            {
-                question: "Hiện tượng nào sau đây mô tả sự cộng hưởng của các điện tử tự do trên bề mặt hạt nano kim loại khi tương tác với sóng ánh sáng?",
-                options: [
-                    "Nhiễu xạ Bragg",
-                    "Hiệu ứng quang điện",
-                    "Cộng hưởng plasmon bề mặt (SPR)",
-                    "Giam hãm lượng tử (Quantum confinement)"
-                ],
-                correctAnswer: "Cộng hưởng plasmon bề mặt (SPR)"
-            }
-        ];
+    <!-- Result Screen -->
+    <div id="result-screen" class="result-screen">
+        <div id="result-screen-capture">
+            <h2>Kết Quả Trò Chơi</h2>
+            <div class="score-display">
+                <span id="final-score"></span>/10
+            </div>
+            <p id="result-message" class="message"></p>
+        </div>
+        <button id="save-image-button">Lưu ảnh kết quả</button>
+        <button onclick="window.location.reload()">Chơi lại</button>
+    </div>
+    
+    <canvas id="result-canvas"></canvas>
 
+</div>
 
-        let currentQuestionIndex = 0;
-        let score = 0;
-        let selectedAnswer = null;
+<audio id="correct-sound" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" preload="auto"></audio>
+<audio id="wrong-sound" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-13.mp3" preload="auto"></audio>
 
+<script>
+    // --- Global Variables and Constants ---
+    const startScreen = document.getElementById('start-screen');
+    const gameScreen = document.getElementById('game-screen');
+    const resultScreen = document.getElementById('result-screen');
+    const userNameInput = document.getElementById('user-name');
+    const userSttInput = document.getElementById('user-stt');
+    const startButton = document.getElementById('start-button');
+    const timerDisplay = document.getElementById('timer');
+    const scoreDisplay = document.getElementById('score');
+    const questionTextElement = document.getElementById('question-text');
+    const optionsContainer = document.getElementById('options-container');
+    const explanationBox = document.getElementById('explanation-box');
+    const hintButton = document.getElementById('hint-button');
+    const skipButton = document.getElementById('skip-button');
+    const finalScoreDisplay = document.getElementById('final-score');
+    const resultMessage = document.getElementById('result-message');
+    const saveImageButton = document.getElementById('save-image-button');
+    const resultCanvas = document.getElementById('result-canvas');
 
-        const app = document.getElementById('app');
-        const startScreen = document.getElementById('start-screen');
-        const quizContainer = document.getElementById('quiz-container');
-        const resultScreen = document.getElementById('result-screen');
-       
-        const startBtn = document.getElementById('start-btn');
-        const questionText = document.getElementById('question-text');
-        const optionsContainer = document.getElementById('options-container');
-        const feedbackContainer = document.getElementById('feedback-container');
-        const nextBtn = document.getElementById('next-btn');
-        const restartBtn = document.getElementById('restart-btn');
-       
-        const scoreDisplay = document.getElementById('score-display');
-        const totalQuestionsDisplay = document.getElementById('total-questions');
-        const resultMessage = document.getElementById('result-message');
+    const correctSound = document.getElementById('correct-sound');
+    const wrongSound = document.getElementById('wrong-sound');
 
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let timeRemaining = 60;
+    let timerInterval;
+    let userName, userStt;
 
-        // Bắt đầu quiz
-        startBtn.addEventListener('click', startQuiz);
-        nextBtn.addEventListener('click', nextQuestion);
-        restartBtn.addEventListener('click', restartQuiz);
+    // --- Question Data (Vietnamese) ---
+    const questions = [
+        // 4 Multiple-choice questions (Trắc nghiệm)
+        {
+            type: 'multiple_choice',
+            question: "Định luật I Newton còn được gọi là gì?",
+            options: ["Định luật bảo toàn động lượng", "Định luật quán tính", "Định luật hấp dẫn", "Định luật bảo toàn năng lượng"],
+            answer: "Định luật quán tính",
+            explanation: "Định luật I Newton mô tả trạng thái của một vật khi không có lực tác dụng, đó chính là tính quán tính của vật.",
+            hint: "Nó liên quan đến khả năng duy trì trạng thái chuyển động của vật."
+        },
+        {
+            type: 'multiple_choice',
+            question: "Trong công thức $F = ma$, F là gì?",
+            options: ["Vận tốc", "Gia tốc", "Lực", "Khối lượng"],
+            answer: "Lực",
+            explanation: "Trong công thức $F = ma$ của định luật II Newton, F là lực tác dụng lên vật, m là khối lượng, và a là gia tốc.",
+            hint: "Nó là nguyên nhân làm thay đổi vận tốc của vật."
+        },
+        {
+            type: 'multiple_choice',
+            question: "Một chiếc xe đang di chuyển trên đường thì dừng lại đột ngột. Hành khách bị đổ người về phía trước. Hiện tượng này giải thích bằng định luật nào?",
+            options: ["Định luật I Newton", "Định luật II Newton", "Định luật III Newton", "Định luật bảo toàn năng lượng"],
+            answer: "Định luật I Newton",
+            explanation: "Đây là ví dụ về quán tính. Khi xe dừng lại, hành khách vẫn có xu hướng tiếp tục chuyển động về phía trước.",
+            hint: "Nó liên quan đến quán tính của vật."
+        },
+        {
+            type: 'multiple_choice',
+            question: "Định luật III Newton nói về điều gì?",
+            options: ["Mối quan hệ giữa lực, khối lượng và gia tốc", "Tác dụng giữa hai vật là những lực trực đối", "Vật sẽ giữ nguyên trạng thái nếu không có lực tác dụng", "Sự bảo toàn năng lượng trong va chạm"],
+            answer: "Tác dụng giữa hai vật là những lực trực đối",
+            explanation: "Định luật III Newton khẳng định rằng khi vật A tác dụng lên vật B một lực, vật B cũng tác dụng lại vật A một lực. Hai lực này có cùng phương, cùng độ lớn nhưng ngược chiều.",
+            hint: "Từ khóa là 'lực và phản lực'."
+        },
+        // 3 Fill-in-the-blank questions (Điền từ)
+        {
+            type: 'fill_in_blank',
+            question: "Theo định luật I Newton, một vật sẽ giữ nguyên trạng thái _____ hoặc chuyển động thẳng đều nếu không có lực nào tác dụng lên nó.",
+            answer: "đứng yên",
+            explanation: "Định luật I Newton: Một vật sẽ giữ nguyên trạng thái đứng yên hoặc chuyển động thẳng đều nếu không có lực nào tác dụng lên nó, hoặc tổng hợp các lực tác dụng lên nó bằng không.",
+            hint: "Trạng thái ngược với chuyển động."
+        },
+        {
+            type: 'fill_in_blank',
+            question: "Theo định luật II Newton, gia tốc của một vật có cùng hướng với _____ tác dụng lên vật và độ lớn của nó tỉ lệ thuận với độ lớn của lực và tỉ lệ nghịch với khối lượng của vật.",
+            answer: "lực",
+            explanation: "Định luật II Newton: Gia tốc của một vật có cùng hướng với lực tác dụng lên vật và độ lớn của nó tỉ lệ thuận với độ lớn của lực và tỉ lệ nghịch với khối lượng của vật.",
+            hint: "F trong công thức $F = ma$."
+        },
+        {
+            type: 'fill_in_blank',
+            question: "Theo định luật III Newton, hai lực tác dụng và phản lực có cùng phương, cùng _____ nhưng ngược chiều.",
+            answer: "độ lớn",
+            explanation: "Định luật III Newton: Khi vật A tác dụng lên vật B một lực, thì vật B cũng tác dụng lại vật A một lực. Hai lực này có cùng phương, cùng độ lớn nhưng ngược chiều.",
+            hint: "Lượng lực bằng nhau."
+        },
+        // 3 Matching questions (Nối cặp)
+        {
+            type: 'matching',
+            question: "Hãy nối các định luật với khái niệm liên quan của chúng.",
+            options: [
+                { id: 'q1', text: 'Định luật I Newton' },
+                { id: 'q2', text: 'Định luật II Newton' },
+                { id: 'q3', text: 'Định luật III Newton' },
+                { id: 'a1', text: 'Lực và phản lực' },
+                { id: 'a2', text: 'Công thức $F = ma$' },
+                { id: 'a3', text: 'Tính quán tính' }
+            ],
+            answer: [
+                { q: 'q1', a: 'a3' },
+                { q: 'q2', a: 'a2' },
+                { q: 'q3', a: 'a1' }
+            ],
+            explanation: "• Định luật I Newton liên quan đến tính quán tính của vật.\n• Định luật II Newton thiết lập mối quan hệ giữa lực, khối lượng và gia tốc qua công thức $F = ma$.\n• Định luật III Newton mô tả mối quan hệ giữa lực tác dụng và lực phản tác dụng.",
+            hint: "Định luật thứ ba là về lực và phản lực."
+        }
+    ];
 
+    // --- Game Logic Functions ---
+    
+    // Play sound effects
+    function playCorrectSound() {
+        correctSound.play();
+    }
+    
+    function playWrongSound() {
+        wrongSound.play();
+    }
 
-        function startQuiz() {
-            startScreen.classList.add('hidden');
-            quizContainer.classList.remove('hidden');
-            score = 0;
-            currentQuestionIndex = 0;
-            showQuestion();
+    // Initialize the game
+    function startGame() {
+        userName = userNameInput.value;
+        userStt = userSttInput.value;
+        if (!userName || !userStt) {
+            alert('Vui lòng nhập tên và số thứ tự để bắt đầu!');
+            return;
         }
 
+        startScreen.style.display = 'none';
+        gameScreen.style.display = 'flex';
+        score = 0;
+        currentQuestionIndex = 0;
+        timeRemaining = 60;
+        updateScoreDisplay();
+        updateTimer();
+        loadQuestion();
+    }
 
-        function showQuestion() {
-            // Xóa các tùy chọn cũ và phản hồi
-            optionsContainer.innerHTML = '';
-            feedbackContainer.textContent = '';
-            nextBtn.classList.add('hidden');
-
-
-            const currentQuestion = quizQuestions[currentQuestionIndex];
-            questionText.textContent = `${currentQuestionIndex + 1}. ${currentQuestion.question}`;
-           
-            // Xóa các thẻ cũ nếu có để tránh lỗi khi render LaTeX
-            const existingScript = document.getElementById('mathjax-script');
-            if (existingScript) {
-                existingScript.remove();
+    // Update the timer display
+    function updateTimer() {
+        timerInterval = setInterval(() => {
+            timeRemaining--;
+            timerDisplay.textContent = `⏰ ${timeRemaining}s`;
+            if (timeRemaining <= 0) {
+                clearInterval(timerInterval);
+                endGame();
             }
+        }, 1000);
+    }
+    
+    // Update the score display
+    function updateScoreDisplay() {
+        scoreDisplay.textContent = `⭐ Điểm: ${score.toFixed(1)}`;
+    }
 
+    // Load and display the current question
+    function loadQuestion() {
+        explanationBox.textContent = '';
+        explanationBox.classList.remove('show');
+        optionsContainer.innerHTML = '';
+        hintButton.disabled = false;
 
-            // Render lại question text để hiển thị LaTeX nếu có
-            if (window.MathJax) {
-                window.MathJax.typeset([questionText]);
-            }
-           
-            currentQuestion.options.forEach((option, index) => {
-                const button = document.createElement('button');
-                button.textContent = option;
-                button.classList.add(
-                    'w-full', 'py-3', 'px-6', 'rounded-xl', 'text-left', 'text-gray-700',
-                    'bg-gray-100', 'hover:bg-gray-200', 'transition', 'duration-200',
-                    'focus:outline-none', 'focus:ring-2', 'focus:ring-blue-400'
-                );
-                button.addEventListener('click', () => selectAnswer(index));
-                optionsContainer.appendChild(button);
-            });
-
-
-            // Sau khi thêm các nút, render lại LaTeX trong các nút
-            if (window.MathJax) {
-                optionsContainer.querySelectorAll('button').forEach(btn => {
-                    window.MathJax.typeset([btn]);
-                });
-            }
+        if (currentQuestionIndex >= questions.length) {
+            endGame();
+            return;
         }
 
+        const currentQ = questions[currentQuestionIndex];
+        questionTextElement.innerHTML = currentQ.question;
 
-        function selectAnswer(selectedIndex) {
-            if (selectedAnswer !== null) return; // Ngăn người dùng chọn lại
+        switch (currentQ.type) {
+            case 'multiple_choice':
+                renderMultipleChoice(currentQ);
+                break;
+            case 'fill_in_blank':
+                renderFillInBlank(currentQ);
+                break;
+            case 'matching':
+                renderMatching(currentQ);
+                break;
+        }
+    }
 
+    // Render multiple choice questions
+    function renderMultipleChoice(q) {
+        optionsContainer.classList.remove('fill-in-blank-container', 'matching-container');
+        optionsContainer.classList.add('options-container');
 
-            selectedAnswer = selectedIndex;
-            const currentQuestion = quizQuestions[currentQuestionIndex];
-            const options = optionsContainer.querySelectorAll('button');
+        q.options.forEach(option => {
+            const button = document.createElement('button');
+            button.className = 'option-button';
+            button.textContent = option;
+            button.onclick = () => handleAnswer(button, option);
+            optionsContainer.appendChild(button);
+        });
+    }
 
+    // Handle multiple choice answer
+    function handleMultipleChoiceAnswer(selectedButton, selectedAnswer) {
+        const correct = selectedAnswer === questions[currentQuestionIndex].answer;
+        const allButtons = document.querySelectorAll('.option-button');
 
-            options.forEach((option, index) => {
-                option.disabled = true; // Vô hiệu hóa tất cả các nút
+        allButtons.forEach(btn => {
+            btn.disabled = true;
+            if (btn.textContent === questions[currentQuestionIndex].answer) {
+                btn.classList.add('correct');
+            }
+        });
 
-
-                // Tô màu cho các nút
-                if (index === selectedIndex) {
-                    if (option.textContent === currentQuestion.correctAnswer) {
-                        option.classList.remove('bg-gray-100');
-                        option.classList.add('bg-green-200');
-                        score++;
-                        feedbackContainer.textContent = "Chính xác!";
-                        feedbackContainer.classList.add('text-green-600');
-                    } else {
-                        option.classList.remove('bg-gray-100');
-                        option.classList.add('bg-red-200');
-                        feedbackContainer.textContent = "Sai rồi.";
-                        feedbackContainer.classList.add('text-red-600');
-                    }
-                }
-                // Tô màu cho câu trả lời đúng nếu người dùng chọn sai
-                if (option.textContent === currentQuestion.correctAnswer) {
-                    option.classList.remove('bg-gray-100');
-                    option.classList.add('bg-green-300');
-                }
-            });
-
-
-            nextBtn.classList.remove('hidden');
+        if (correct) {
+            selectedButton.classList.add('correct');
+            score += 1;
+            playCorrectSound();
+        } else {
+            selectedButton.classList.add('wrong');
+            playWrongSound();
         }
 
-
-        function nextQuestion() {
-            selectedAnswer = null; // Reset trạng thái chọn
-            feedbackContainer.textContent = ''; // Xóa phản hồi
+        updateScoreDisplay();
+        showExplanation();
+        setTimeout(() => {
             currentQuestionIndex++;
+            loadQuestion();
+        }, 3000);
+    }
 
+    // Render fill-in-the-blank questions
+    function renderFillInBlank(q) {
+        optionsContainer.classList.remove('options-container', 'matching-container');
+        optionsContainer.classList.add('fill-in-blank-container');
 
-            if (currentQuestionIndex < quizQuestions.length) {
-                showQuestion();
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.placeholder = 'Nhập từ của bạn...';
+        input.id = 'fill-in-input';
+        optionsContainer.appendChild(input);
+
+        const submitButton = document.createElement('button');
+        submitButton.textContent = 'Gửi câu trả lời';
+        submitButton.onclick = () => handleFillInBlankAnswer(input.value);
+        optionsContainer.appendChild(submitButton);
+    }
+    
+    // Handle fill-in-the-blank answer
+    function handleFillInBlankAnswer(answer) {
+        const correct = answer.trim().toLowerCase() === questions[currentQuestionIndex].answer.toLowerCase();
+        
+        if (correct) {
+            score += 1;
+            playCorrectSound();
+        } else {
+            playWrongSound();
+        }
+        
+        updateScoreDisplay();
+        showExplanation();
+        document.getElementById('fill-in-input').disabled = true;
+        document.querySelector('.fill-in-blank-container button').disabled = true;
+
+        setTimeout(() => {
+            currentQuestionIndex++;
+            loadQuestion();
+        }, 3000);
+    }
+    
+    // Render matching questions
+    function renderMatching(q) {
+        optionsContainer.classList.remove('options-container', 'fill-in-blank-container');
+        optionsContainer.classList.add('matching-container');
+        
+        const qOptions = q.options.filter(o => o.id.startsWith('q'));
+        const aOptions = q.options.filter(o => o.id.startsWith('a'));
+        
+        // Shuffle the answer options to make it a challenge
+        aOptions.sort(() => Math.random() - 0.5);
+
+        let selectedQ = null;
+        let matchedCount = 0;
+        const correctMatches = q.answer.map(pair => ({ ...pair }));
+
+        function checkMatch(qId, aId) {
+            const foundMatch = correctMatches.find(m => m.q === qId && m.a === aId);
+            if (foundMatch) {
+                matchedCount++;
+                const qElem = document.getElementById(qId);
+                const aElem = document.getElementById(aId);
+                qElem.classList.add('matched');
+                aElem.classList.add('matched');
+                qElem.classList.remove('selected');
+                aElem.classList.remove('selected');
+                score += 1/3; // Add a third of a point for each correct match
+
+                if (matchedCount === q.answer.length) {
+                    playCorrectSound();
+                    updateScoreDisplay();
+                    showExplanation();
+                    setTimeout(() => {
+                        currentQuestionIndex++;
+                        loadQuestion();
+                    }, 3000);
+                }
             } else {
-                showResult();
+                playWrongSound();
+                selectedQ = null;
+                document.getElementById(qId).classList.remove('selected');
+                document.getElementById(aId).classList.remove('selected');
             }
         }
+        
+        qOptions.forEach(item => {
+            const button = document.createElement('button');
+            button.className = 'matching-item';
+            button.id = item.id;
+            button.textContent = item.text;
+            button.onclick = () => {
+                if (button.classList.contains('matched')) return;
+                if (selectedQ && selectedQ.id !== button.id) {
+                    selectedQ.classList.remove('selected');
+                }
+                button.classList.add('selected');
+                selectedQ = button;
+            };
+            optionsContainer.appendChild(button);
+        });
+
+        aOptions.forEach(item => {
+            const button = document.createElement('button');
+            button.className = 'matching-item';
+            button.id = item.id;
+            button.textContent = item.text;
+            button.onclick = () => {
+                if (button.classList.contains('matched')) return;
+                if (selectedQ) {
+                    button.classList.add('selected');
+                    checkMatch(selectedQ.id, button.id);
+                    selectedQ = null;
+                }
+            };
+            optionsContainer.appendChild(button);
+        });
+
+        // Hide hint and skip for this question type
+        hintButton.style.display = 'none';
+        skipButton.style.display = 'none';
+    }
 
 
-        function showResult() {
-            quizContainer.classList.add('hidden');
-            resultScreen.classList.remove('hidden');
-            scoreDisplay.textContent = score;
-            totalQuestionsDisplay.textContent = quizQuestions.length;
-
-
-            let message = "";
-            const percentage = (score / quizQuestions.length) * 100;
-            if (percentage >= 80) {
-                message = "Xuất sắc! Bạn có kiến thức rất vững chắc.";
-            } else if (percentage >= 50) {
-                message = "Khá tốt! Hãy cố gắng hơn nữa nhé.";
-            } else {
-                message = "Bạn cần xem lại tài liệu và ôn tập kỹ hơn.";
-            }
-            resultMessage.textContent = message;
+    // Unified answer handler
+    function handleAnswer(selectedElement, selectedAnswer) {
+        if (questions[currentQuestionIndex].type === 'multiple_choice') {
+            handleMultipleChoiceAnswer(selectedElement, selectedAnswer);
         }
+    }
+    
+    // Show the explanation for the current question
+    function showExplanation() {
+        explanationBox.textContent = questions[currentQuestionIndex].explanation;
+        explanationBox.classList.add('show');
+    }
 
+    // Handle hint button click
+    function handleHint() {
+        score = Math.max(0, score - 0.5);
+        updateScoreDisplay();
+        explanationBox.textContent = `Gợi ý: ${questions[currentQuestionIndex].hint}`;
+        explanationBox.classList.add('show');
+        hintButton.disabled = true;
+    }
 
-        function restartQuiz() {
-            resultScreen.classList.add('hidden');
-            startScreen.classList.remove('hidden');
-            selectedAnswer = null;
+    // Handle skip button click
+    function handleSkip() {
+        explanationBox.textContent = 'Câu hỏi đã được bỏ qua.';
+        explanationBox.classList.add('show');
+        
+        // Wait for a second to show the message before moving on
+        setTimeout(() => {
+            currentQuestionIndex++;
+            loadQuestion();
+        }, 1000);
+    }
+    
+    // End the game and show the result screen
+    function endGame() {
+        clearInterval(timerInterval);
+        gameScreen.style.display = 'none';
+        resultScreen.style.display = 'flex';
+        
+        const finalScore = score.toFixed(1);
+        finalScoreDisplay.textContent = finalScore;
+        
+        let message = '';
+        if (finalScore >= 5) {
+            message = 'Chúc mừng! Bạn đã hoàn thành xuất sắc trò chơi!';
+        } else {
+            message = 'Đừng buồn! Hãy thử lại và ôn tập thêm nhé!';
         }
-       
-        // Cấu hình MathJax để render công thức toán học
-        // Thêm thư viện MathJax để xử lý LaTeX
-        const script = document.createElement('script');
-        script.id = 'mathjax-script';
-        script.src = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js";
-        script.async = true;
-        script.onload = () => {
-             // Đảm bảo MathJax đã load và sẵn sàng trước khi hiển thị câu hỏi
-             if (currentQuestionIndex === 0 && startScreen.classList.contains('hidden')) {
-                showQuestion();
-             }
-        };
-        document.head.appendChild(script);
+        resultMessage.textContent = message;
+    }
 
+    // Save the result screen as an image
+    saveImageButton.onclick = function() {
+        const captureArea = document.getElementById('result-screen-capture');
+        const canvas = document.getElementById('result-canvas');
+        const ctx = canvas.getContext('2d');
+        const dpi = window.devicePixelRatio || 1;
+        const width = captureArea.offsetWidth * dpi;
+        const height = captureArea.offsetHeight * dpi;
 
-    </script>
+        canvas.width = width;
+        canvas.height = height;
+        ctx.scale(dpi, dpi);
+
+        // Draw background
+        ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--bg-color');
+        ctx.fillRect(0, 0, captureArea.offsetWidth, captureArea.offsetHeight);
+
+        // Draw text and scores
+        ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--primary-color');
+        ctx.font = `bold 24px 'Cabin', sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.fillText('Kết Quả Trò Chơi', captureArea.offsetWidth / 2, 40);
+        
+        ctx.font = `bold 16px 'Cabin', sans-serif`;
+        ctx.fillText(`Học sinh: ${userName}`, captureArea.offsetWidth / 2, 70);
+        ctx.fillText(`S.T.T: ${userStt}`, captureArea.offsetWidth / 2, 95);
+
+        ctx.font = `bold 48px 'Cabin', sans-serif`;
+        ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--correct-color');
+        ctx.fillText(finalScoreDisplay.textContent + '/10', captureArea.offsetWidth / 2, 160);
+        
+        ctx.font = `18px 'Cabin', sans-serif`;
+        ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--primary-color');
+        ctx.fillText(resultMessage.textContent, captureArea.offsetWidth / 2, 210);
+
+        // Trigger the download
+        const link = document.createElement('a');
+        link.download = `Ket_qua_tro_choi_vat_ly_${userName}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    };
+
+    // --- Event Listeners ---
+    startButton.addEventListener('click', startGame);
+    hintButton.addEventListener('click', handleHint);
+    skipButton.addEventListener('click', handleSkip);
+
+</script>
+
 </body>
 </html>
-
-
-
